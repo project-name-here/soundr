@@ -1,4 +1,4 @@
-module example/soundr
+module pnh/soundr
 
 go 1.18
 

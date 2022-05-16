@@ -15,7 +15,13 @@ Installation is as simple as it gets as it is a single executable.
 Download one of the releases, drop your sounds into the /sounds folder and run the executable.
 
 # Configuration
-TODO, no config yet. Soon ports and other settings will be added.
+The configuration is done in the `conf.json` file.
+This is the basic json configuration file layout:
+```json
+{
+    "Port": 8082
+}
+```
 
 # Usage
 Drop your sounds into the /sounds. You can play them by sending a GET request to the /v1/play endpoint.

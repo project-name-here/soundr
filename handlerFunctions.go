@@ -2,13 +2,18 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
 	"github.com/faiface/beep"
+	"github.com/faiface/beep/flac"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
+	"github.com/faiface/beep/vorbis"
+	"github.com/faiface/beep/wav"
+	"github.com/h2non/filetype"
 )
 
 func BufferSound(file string) bool {
@@ -21,7 +26,26 @@ func BufferSound(file string) bool {
 		}
 
 		fmt.Println("Opened file")
-		streamer, format, _ := mp3.Decode(f)
+		buf, _ := ioutil.ReadFile("sounds/" + string(file))
+
+		kind, _ := filetype.Match(buf)
+
+		fmt.Println("File type: " + kind.MIME.Subtype)
+		var streamer beep.StreamSeekCloser
+		var format beep.Format
+		if kind.MIME.Subtype == "mpeg" {
+			streamer, format, _ = mp3.Decode(f)
+		} else if kind.MIME.Subtype == "x-wav" {
+			streamer, format, _ = wav.Decode(f)
+		} else if kind.MIME.Subtype == "x-flac" {
+			streamer, format, _ = flac.Decode(f)
+		} else if kind.MIME.Subtype == "ogg" {
+			streamer, format, _ = vorbis.Decode(f)
+		} else {
+			fmt.Println("!!!!! Unsupported file type for " + file)
+			return false
+		}
+
 		speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 
 		fmt.Println("Decoded file")

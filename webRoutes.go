@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/faiface/beep/speaker"
+	"github.com/h2non/filetype"
 )
 
 func handlePlay(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +41,19 @@ func handlePlay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	buf, _ := ioutil.ReadFile("sounds/" + string(bytArr[:]))
+
+	kind, _ := filetype.Match(buf)
+	if kind == filetype.Unknown {
+		fmt.Println("Unknown file type")
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"file has unknown type\"}")
+		return
+	}
+	if kind.MIME.Type != "audio" {
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"file is not an audio file\"}")
+		return
+	}
+
 	var currIndex = len(playbacks)                              // Create a new index for the playback
 	fmt.Fprintf(w, "{\"status\":\"ok\", \"id\":%d}", currIndex) // Return a JSON object to the user
 
@@ -65,6 +79,18 @@ func handleBufferAll(w http.ResponseWriter, r *http.Request) {
 	// Loop through the files and add the file name to the temp array
 	// Also triggers the buffer process for the file
 	for _, f := range files {
+		buf, _ := ioutil.ReadFile("sounds/" + string(f.Name()))
+
+		kind, _ := filetype.Match(buf)
+		if kind == filetype.Unknown {
+			fmt.Println("Unknown file type")
+
+			continue
+		}
+		if kind.MIME.Type != "audio" {
+			fmt.Println("Not an audio file")
+			continue
+		}
 		temp = append(temp, f.Name())
 		go BufferSound(f.Name())
 	}
@@ -96,6 +122,19 @@ func handleBuffer(w http.ResponseWriter, r *http.Request) {
 	if t.IsDir() { // Make sure it is not a folder we are trying to play
 		w.WriteHeader(400)
 		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"target is folder\"}")
+		return
+	}
+
+	buf, _ := ioutil.ReadFile("sounds/" + string(bytArr[:]))
+
+	kind, _ := filetype.Match(buf)
+	if kind == filetype.Unknown {
+		fmt.Println("Unknown file type")
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"file has unknown type\"}")
+		return
+	}
+	if kind.MIME.Type != "audio" {
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"file is not an audio file\"}")
 		return
 	}
 
@@ -195,6 +234,20 @@ func handleListing(w http.ResponseWriter, r *http.Request) {
 		soundObj[0] = f.Name()
 		soundObj[1] = base64.StdEncoding.EncodeToString([]byte(f.Name()))
 		soundObj[2] = r.URL.Host + "/v1/play?file=" + soundObj[1]
+
+		buf, _ := ioutil.ReadFile("sounds/" + f.Name())
+
+		kind, _ := filetype.Match(buf)
+		fmt.Println(f.Name() + " " + kind.MIME.Type)
+		if kind == filetype.Unknown {
+			fmt.Println("Unknown file type")
+			continue
+		}
+		if kind.MIME.Type != "audio" {
+			fmt.Println("Not an audio file")
+			continue
+		}
+
 		temp = append(temp, soundObj)
 	}
 	// Convert the array to a JSON object and return it to the user

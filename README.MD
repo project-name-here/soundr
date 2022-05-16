@@ -28,7 +28,4 @@ Drop your sounds into the /sounds. You can play them by sending a GET request to
 You need to know the base64 encoded file name of the sound you want to play. You can get started by querying /v1/list. It will return a list of all sounds with their respective base64 encoded file name.
 Use that base64 as the `file` parameter in the request.
 
-**Note**: The sounds must be in the format `*.mp3` (more will be supported soon :tm:).
-
-# ToDo
-- [ ] Add support for other audio formats
+**Note**: The sounds must be in the format `*.mp3`, `*.wav`, `*.flac` or `*.ogg` (`flac` files may take longer time to buffer).

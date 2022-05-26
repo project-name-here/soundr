@@ -66,12 +66,13 @@ func BufferSound(file string) bool {
 	}
 }
 
-func PlaySound(file string, index int) int {
+func PlaySound(file string, index int, loop bool) int {
 	playbacks[index] = playback{
 		File:     file,
 		IsLoaded: false,
 		Streamer: nil,
 		Control:  nil,
+		Loop:     loop,
 	}
 
 	fmt.Println("Playing sound: " + file)
@@ -93,10 +94,15 @@ func PlaySound(file string, index int) int {
 		IsLoaded: true,
 		Streamer: streamer,
 		Control:  ctrl,
+		Loop:     loop,
 	}
 	speaker.Play(ctrl)
 	<-done
 	fmt.Println("Finished playing sound: " + file)
-	delete(playbacks, index)
+	if playbacks[index].Loop {
+		playbacks[index].Control.Paused = true
+		PlaySound(file, index, loop)
+		delete(playbacks, index)
+	}
 	return 1
 }

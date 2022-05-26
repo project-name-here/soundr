@@ -16,6 +16,7 @@ type playback struct {
 	IsLoaded bool
 	Streamer beep.Streamer
 	Control  *beep.Ctrl
+	Loop     bool
 }
 
 type playbackWebReturn struct {

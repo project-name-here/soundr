@@ -14,6 +14,11 @@ paths:
           description: A base64 encoded version of the file name
           schema:
             type: string
+        - in: query
+          name: loop
+          description: Defaults to false; if true, will loop the sound until stopped
+          schema:
+            type: boolean
       responses:
         '200':
           description: OK

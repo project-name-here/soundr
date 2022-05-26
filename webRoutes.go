@@ -25,7 +25,13 @@ func handlePlay(w http.ResponseWriter, r *http.Request) {
 	var cnt = r.URL.Query().Get("file")                 // Retrieve the file name from the query string
 	bytArr, err := base64.StdEncoding.DecodeString(cnt) // Decode the base64 string
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\""+err.Error()+"\"}")
+		return
+	}
+	loop := r.URL.Query().Get("loop") // Retrieve the loop value from the query string
+	loopBool := false
+	if loop == "true" {
+		loopBool = true
 	}
 
 	t, err := os.Stat("./sounds/" + string(bytArr[:])) // Check if the file exists
@@ -57,7 +63,7 @@ func handlePlay(w http.ResponseWriter, r *http.Request) {
 	var currIndex = len(playbacks)                              // Create a new index for the playback
 	fmt.Fprintf(w, "{\"status\":\"ok\", \"id\":%d}", currIndex) // Return a JSON object to the user
 
-	go PlaySound(string(bytArr[:]), currIndex) // Play the sound
+	go PlaySound(string(bytArr[:]), currIndex, loopBool) // Play the sound
 
 }
 
@@ -74,7 +80,8 @@ func handleBufferAll(w http.ResponseWriter, r *http.Request) {
 	var temp []string
 	files, err := ioutil.ReadDir("./sounds/") // Read the directory
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\""+err.Error()+"\"}")
+		return
 	}
 	// Loop through the files and add the file name to the temp array
 	// Also triggers the buffer process for the file
@@ -109,7 +116,8 @@ func handleBuffer(w http.ResponseWriter, r *http.Request) {
 	var cnt = r.URL.Query().Get("file")                 // Retrieve the file name from the query string
 	bytArr, err := base64.StdEncoding.DecodeString(cnt) // Decode the base64 string
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\""+err.Error()+"\"}")
+		return
 	}
 
 	t, err := os.Stat("./sounds/" + string(bytArr[:])) // Check if the file exists

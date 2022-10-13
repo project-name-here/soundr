@@ -34,6 +34,8 @@ func handlePlay(w http.ResponseWriter, r *http.Request) {
 		loopBool = true
 	}
 
+	wantedId := r.URL.Query().Get("id") // Retrieve the id value from the query string, it's optional
+
 	t, err := os.Stat("./sounds/" + string(bytArr[:])) // Check if the file exists
 	if errors.Is(err, os.ErrNotExist) {
 		w.WriteHeader(400)
@@ -60,7 +62,21 @@ func handlePlay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var currIndex = len(playbacks)                              // Create a new index for the playback
+	var currIndex = len(playbacks) // Create a new index for the playback
+
+	if len(wantedId) > 0 { // If the id is set, check if it is already in use
+		id, err := strconv.Atoi(wantedId)
+		if err != nil {
+			fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"id is not a number\"}")
+			return
+		}
+		if _, ok := playbacks[id]; ok {
+			fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"id is already in use\"}")
+			return
+		}
+		currIndex = id
+	}
+
 	fmt.Fprintf(w, "{\"status\":\"ok\", \"id\":%d}", currIndex) // Return a JSON object to the user
 
 	go PlaySound(string(bytArr[:]), currIndex, loopBool) // Play the sound
@@ -266,4 +282,8 @@ func handleListing(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(string(j))
 		fmt.Fprintf(w, string(j))
 	}
+}
+
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Soundr is running.")
 }

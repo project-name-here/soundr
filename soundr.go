@@ -90,6 +90,7 @@ func main() {
 	http.HandleFunc("/v1/stopAll", handleStopAll)
 	http.HandleFunc("/v1/current", handleCurrent)
 	http.HandleFunc("/v1/list", handleListing)
+	http.HandleFunc("/", handleRoot)
 
 	fmt.Println("Listening on port " + fmt.Sprint(configuration.Port))
 	log.Fatal(http.ListenAndServe(":"+fmt.Sprint(configuration.Port), nil))

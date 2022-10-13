@@ -14,9 +14,11 @@ import (
 type playback struct {
 	File     string
 	IsLoaded bool
-	Streamer beep.Streamer
+	Streamer beep.StreamSeeker
 	Control  *beep.Ctrl
 	Loop     bool
+	Format   beep.Format
+	Done     chan bool
 }
 
 type playbackWebReturn struct {
@@ -90,6 +92,7 @@ func main() {
 	http.HandleFunc("/v1/stopAll", handleStopAll)
 	http.HandleFunc("/v1/current", handleCurrent)
 	http.HandleFunc("/v1/list", handleListing)
+	http.HandleFunc("/v1/remaining", handleRemaining)
 	http.HandleFunc("/", handleRoot)
 
 	fmt.Println("Listening on port " + fmt.Sprint(configuration.Port))

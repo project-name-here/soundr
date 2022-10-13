@@ -73,36 +73,38 @@ func PlaySound(file string, index int, loop bool) int {
 		Streamer: nil,
 		Control:  nil,
 		Loop:     loop,
+		Format:   streamMap[file].Format,
 	}
 
 	fmt.Println("Playing sound: " + file)
 	var buffer *beep.Buffer
 	BufferSound(file)
 	buffer = streamMap[file].Buffer
-	streamer := streamMap[file].Streamer
+	// streamer := streamMap[file].Streamer
 
 	fmt.Println("Trying to play sound")
-	shot := buffer.Streamer(0, buffer.Len())
+	amountOfLoops := 1
+	if loop {
+		amountOfLoops = -1
+	}
+	shot := buffer.Streamer(amountOfLoops, buffer.Len())
 
 	done := make(chan bool)
-	ctrl := &beep.Ctrl{Streamer: beep.Seq(shot, beep.Callback(func() {
-		done <- true
-	})), Paused: false}
+	ctrl := &beep.Ctrl{Streamer: shot, Paused: false}
 
 	playbacks[index] = playback{
 		File:     file,
 		IsLoaded: true,
-		Streamer: streamer,
+		Streamer: shot,
 		Control:  ctrl,
 		Loop:     loop,
+		Format:   streamMap[file].Format,
+		Done:     done,
 	}
 	speaker.Play(ctrl)
 	<-done
 	fmt.Println("Finished playing sound: " + file)
-	if playbacks[index].Loop {
-		playbacks[index].Control.Paused = true
-		PlaySound(file, index, loop)
-		delete(playbacks, index)
-	}
+	delete(playbacks, index)
+
 	return 1
 }

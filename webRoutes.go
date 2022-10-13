@@ -284,6 +284,42 @@ func handleListing(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func handleRemaining(w http.ResponseWriter, r *http.Request) {
+	// Rejct everything else then GET requests
+	if r.Method != "GET" {
+		http.Error(w, "Method is not supported.", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")   // Set the content type to json
+	var cnt, err = strconv.Atoi(r.URL.Query().Get("id")) // Retrieve the id, first convert it to an int
+	if err != nil {
+		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"invalid id\"}")
+	}
+	fmt.Println(cnt)
+	plyB := playbacks[cnt]
+	// fmt.Println(beep.SampleRate.D(plyB.Streamer.Stream().Len()))
+	seeker := plyB.Streamer
+	format := plyB.Format
+	n := plyB.Format.SampleRate // Streamer.Stream() // .At(beep.SampleRate.D(plyB.Streamer.Stream().Len()))
+
+	if seeker != nil {
+		fmt.Println(format.SampleRate)
+		// fmt.Println(plyB.Seeker.)
+		position := plyB.Format.SampleRate.D(seeker.Position())
+		length := plyB.Format.SampleRate.D(seeker.Len())
+		remaining := length - position
+		if remaining == 0 {
+			plyB.Done <- true
+		}
+		fmt.Println(position)
+		fmt.Fprintf(w, "{\"status\":\"ok\", \"SampleRate\":%d, \"Length\":%d, \"Position\":%d, \"Remaining\": %d, \"LengthSec\":\"%v\", \"PosSec\":\"%v\", \"RemaningSec\":\"%v\"}", n, length, position, remaining, length, position, remaining)
+	} else {
+		fmt.Println("Seeker is nil")
+		fmt.Fprintf(w, "{\"status\":\"ok\", \"SampleRate\":%d}", n)
+	}
+
+}
+
 func handleRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Soundr is running.")
 }

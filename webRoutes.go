@@ -311,6 +311,7 @@ func handleRemaining(w http.ResponseWriter, r *http.Request) {
 	var cnt, err = strconv.Atoi(r.URL.Query().Get("id")) // Retrieve the id, first convert it to an int
 	if err != nil {
 		fmt.Fprintf(w, "{\"status\":\"fail\", \"reason\":\"invalid id\"}")
+		return
 	}
 	fmt.Println(cnt)
 	plyB := playbacks[cnt]

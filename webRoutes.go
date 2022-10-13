@@ -329,7 +329,7 @@ func handleRemaining(w http.ResponseWriter, r *http.Request) {
 			plyB.Done <- true
 		}
 		fmt.Println(position)
-		fmt.Fprintf(w, "{\"status\":\"ok\", \"SampleRate\":%d, \"Length\":%d, \"Position\":%d, \"Remaining\": %d, \"LengthSec\":\"%v\", \"PosSec\":\"%v\", \"RemaningSec\":\"%v\"}", n, length, position, remaining, length, position, remaining)
+		fmt.Fprintf(w, "{\"status\":\"ok\", \"id\":%d, \"SampleRate\":%d, \"Length\":%d, \"Position\":%d, \"Remaining\": %d, \"LengthSec\":\"%v\", \"PosSec\":\"%v\", \"RemaningSec\":\"%v\"}", cnt, n, length, position, remaining, length, position, remaining)
 	} else {
 		fmt.Println("Seeker is nil")
 		fmt.Fprintf(w, "{\"status\":\"ok\", \"SampleRate\":%d}", n)

@@ -223,6 +223,23 @@ func handleCurrent(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json") // Set the content type to json
 
+	for i := 0; i < len(playbacks); i++ {
+		plyB := playbacks[i]
+		seeker := plyB.Streamer
+		format := plyB.Format
+
+		if seeker != nil {
+			fmt.Println(format.SampleRate)
+			// fmt.Println(plyB.Seeker.)
+			position := plyB.Format.SampleRate.D(seeker.Position())
+			length := plyB.Format.SampleRate.D(seeker.Len())
+			remaining := length - position
+			if remaining == 0 {
+				plyB.Done <- true
+			}
+		}
+	}
+
 	var tempResultSet map[int]playbackWebReturn = make(map[int]playbackWebReturn) // Create a new map to store the results
 	// Iterate through the playbacks map and add important information to the tempResultSet map
 	for index, element := range playbacks {

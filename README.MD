@@ -21,7 +21,9 @@ This is the basic json configuration file layout:
 {
     "Port": 8082
 }
-```
+``
+
+> All sounds should be in the same bitrate. It will assume the bitrate of the first loaded sample.
 
 # Usage
 Drop your sounds into the /sounds. You can play them by sending a GET request to the /v1/play endpoint.

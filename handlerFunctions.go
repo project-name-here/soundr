@@ -16,6 +16,8 @@ import (
 	"github.com/h2non/filetype"
 )
 
+var firstLoad = true
+
 func BufferSound(file string) bool {
 	_, ok := streamMap[file]
 	if !ok {
@@ -26,9 +28,18 @@ func BufferSound(file string) bool {
 		}
 
 		fmt.Println("Opened file")
-		buf, _ := ioutil.ReadFile("sounds/" + string(file))
+		buf, err := ioutil.ReadFile("sounds/" + string(file))
+		if err != nil {
+			log.Fatal("Fatal error while opening: " + err.Error())
+			return false
+		}
 
-		kind, _ := filetype.Match(buf)
+		kind, err := filetype.Match(buf)
+
+		if err != nil {
+			log.Fatal("Fatal error while detecting file type: " + err.Error())
+			return false
+		}
 
 		fmt.Println("File type: " + kind.MIME.Subtype)
 		var streamer beep.StreamSeekCloser
@@ -45,8 +56,10 @@ func BufferSound(file string) bool {
 			fmt.Println("!!!!! Unsupported file type for " + file)
 			return false
 		}
-
-		speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+		if firstLoad {
+			speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+			firstLoad = false
+		}
 
 		fmt.Println("Decoded file")
 		buffer := beep.NewBuffer(format)

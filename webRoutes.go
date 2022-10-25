@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/faiface/beep/speaker"
 	"github.com/h2non/filetype"
@@ -116,6 +117,7 @@ func handleBufferAll(w http.ResponseWriter, r *http.Request) {
 		}
 		temp = append(temp, f.Name())
 		go BufferSound(f.Name())
+		time.Sleep(200 * time.Millisecond) // Wait a bit to not overload the system
 	}
 	// Return the amount of files buffered
 	fmt.Fprintf(w, "{\"status\":\"ok\", \"amount\":%d}", len(temp))

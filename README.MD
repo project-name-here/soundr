@@ -21,7 +21,7 @@ This is the basic json configuration file layout:
 {
     "Port": 8082
 }
-``
+```
 
 > All sounds should be in the same bitrate. It will assume the bitrate of the first loaded sample.
 

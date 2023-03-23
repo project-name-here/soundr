@@ -99,11 +99,12 @@ func PlaySound(file string, index int, loop bool) int {
 	amountOfLoops := 1
 	if loop {
 		amountOfLoops = -1
+		fmt.Println("Looping sound: " + file)
 	}
-	shot := buffer.Streamer(amountOfLoops, buffer.Len())
+	shot := buffer.Streamer(0, buffer.Len())
 
 	done := make(chan bool)
-	ctrl := &beep.Ctrl{Streamer: shot, Paused: false}
+	ctrl := &beep.Ctrl{Streamer: beep.Loop(amountOfLoops, shot), Paused: false}
 
 	playbacks[index] = playback{
 		File:     file,

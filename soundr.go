@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/faiface/beep"
+	"github.com/getsentry/sentry-go"
 )
 
 type playback struct {
@@ -34,7 +35,8 @@ type streamBuf struct {
 }
 
 type Configuration struct {
-	Port int
+	Port        int
+	AllowSentry bool
 }
 
 var playbacks map[int]playback
@@ -68,7 +70,8 @@ func main() {
 		fmt.Println("Writing to conf.json")
 		// Write the default config to the file
 		json.NewEncoder(file).Encode(Configuration{
-			Port: 8080,
+			Port:        8080,
+			AllowSentry: true,
 		})
 		fmt.Println("Wrote to conf.json")
 	}
@@ -77,6 +80,18 @@ func main() {
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
+
+	if configuration.AllowSentry {
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn: "https://0eae4896cb23446b99a8a5b9f9da75f1@sentry.thegreydiamond.de/8",
+			// Enable printing of SDK debug messages.
+			// Useful when getting started or trying to figure something out.
+			// Debug: true,
+		})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
+	}
 
 	if err != nil {
 		fmt.Println("error:", err)

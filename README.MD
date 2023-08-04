@@ -8,7 +8,7 @@ Soundr is able to play multiple audio files at the same time. It is able to inti
 Swagger Documentation for that endpoint is available in `apiDocs.yml`.
 The software it self is written in go and uses the BEEP library. It is made to be shipped as a single executable.
 Another target was a minimal dependency tree.
-Initally it was written to be used with [Bitfocus Companion](https://bitfocus.io/companion) in a more professional envoriment. (A client for Companion is currently WiP)
+Initally it was written to be used with [Bitfocus Companion](https://bitfocus.io/companion) in a more professional envoriment. [An companion module is now available!](https://github.com/bitfocus/companion-module-pnh-soundr)
 
 # Installation
 Installation is as simple as it gets as it is a single executable.

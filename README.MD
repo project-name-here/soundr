@@ -46,3 +46,6 @@ When playing a sound file it will get an incrementing ID. You can use that ID to
 `GET /remaining` - Takes a `id` parameter. Returns the remaining time of the sound with the given ID.<br>
 
 **Note**: The sounds must be in the format `*.mp3`, `*.wav`, `*.flac` or `*.ogg` (`flac` files may take longer time to buffer).
+
+
+Version 1.1.3

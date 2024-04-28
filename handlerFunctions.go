@@ -7,12 +7,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/faiface/beep"
-	"github.com/faiface/beep/flac"
-	"github.com/faiface/beep/mp3"
-	"github.com/faiface/beep/speaker"
-	"github.com/faiface/beep/vorbis"
-	"github.com/faiface/beep/wav"
+	"github.com/gopxl/beep"
+	"github.com/gopxl/beep/flac"
+	"github.com/gopxl/beep/mp3"
+	"github.com/gopxl/beep/speaker"
+	"github.com/gopxl/beep/vorbis"
+	"github.com/gopxl/beep/wav"
 	"github.com/h2non/filetype"
 )
 
@@ -21,7 +21,7 @@ var firstLoad = true
 func BufferSound(file string) bool {
 	_, ok := streamMap[file]
 	if !ok {
-		fmt.Println("Not in memory, loading")
+		fmt.Println("----Not in memory, loading----")
 		f, err := os.Open("./sounds/" + file)
 		if err != nil {
 			log.Fatal(err)
@@ -45,13 +45,13 @@ func BufferSound(file string) bool {
 		var streamer beep.StreamSeekCloser
 		var format beep.Format
 		if kind.MIME.Subtype == "mpeg" {
-			streamer, format, _ = mp3.Decode(f)
+			streamer, format, err = mp3.Decode(f)
 		} else if kind.MIME.Subtype == "x-wav" {
-			streamer, format, _ = wav.Decode(f)
+			streamer, format, err = wav.Decode(f)
 		} else if kind.MIME.Subtype == "x-flac" {
-			streamer, format, _ = flac.Decode(f)
+			streamer, format, err = flac.Decode(f)
 		} else if kind.MIME.Subtype == "ogg" {
-			streamer, format, _ = vorbis.Decode(f)
+			streamer, format, err = vorbis.Decode(f)
 		} else {
 			fmt.Println("!!!!! Unsupported file type for " + file)
 			return false
@@ -60,8 +60,16 @@ func BufferSound(file string) bool {
 			speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 			firstLoad = false
 		}
+		if err != nil {
+			fmt.Println("Error while decoding file: " + file)
+			fmt.Println("Error: " + fmt.Sprintf("%v", err))
+			return false
+		}
 
 		fmt.Println("Decoded file")
+		fmt.Println("Current file: " + file)
+		fmt.Println("Current streamer: " + fmt.Sprintf("%v", streamer))
+		fmt.Println("Error: " + fmt.Sprintf("%v", err))
 		buffer := beep.NewBuffer(format)
 		buffer.Append(streamer)
 		streamer.Close()

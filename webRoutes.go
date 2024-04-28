@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/faiface/beep/speaker"
+	"github.com/gopxl/beep/speaker"
 	"github.com/h2non/filetype"
 )
 

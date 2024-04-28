@@ -8,8 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/faiface/beep"
-	"github.com/getsentry/sentry-go"
+	"github.com/gopxl/beep"
 )
 
 type playback struct {
@@ -80,18 +79,6 @@ func main() {
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
-
-	if configuration.AllowSentry {
-		err := sentry.Init(sentry.ClientOptions{
-			Dsn: "https://0eae4896cb23446b99a8a5b9f9da75f1@sentry.thegreydiamond.de/8",
-			// Enable printing of SDK debug messages.
-			// Useful when getting started or trying to figure something out.
-			// Debug: true,
-		})
-		if err != nil {
-			log.Fatalf("sentry.Init: %s", err)
-		}
-	}
 
 	if err != nil {
 		fmt.Println("error:", err)
